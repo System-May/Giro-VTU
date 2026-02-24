@@ -2,22 +2,22 @@
   "name": "Controle Unitário - Giro Grão VTU",
   "short_name": "Controle VTU",
   "description": "Sistema de controle Unitário – Giro Grão VTU - SYSTEMAY",
-  "start_url": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f97316",
   "theme_color": "#ea580c",
   "orientation": "landscape",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cmVjdCB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIGZpbGw9IiNlYTU4MGMiLz48cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHg9IjQiIHk9IjMiIHJ4PSIyIi8+PHBhdGggZD0iTTQgMTFoMTYiLz48cGF0aCBkPSJNMTIgM3Y4Ii8+PHBhdGggZD0ibTggMTktMiAzIi8+PHBhdGggZD0ibTE4IDIyLTItMyIvPjxwYXRoIGQ9Ik04IDE1aDAiLz48cGF0aCBkPSJNMTYgMTVoMCIvPjwvc3ZnPg==",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cmVjdCB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIGZpbGw9IiNlYTU4MGMiLz48cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHg9IjQiIHk9IjMiIHJ4PSIyIi8+PHBhdGggZD0iTTQgMTFoMTYiLz48cGF0aCBkPSJNMTIgM3Y4Ii8+PHBhdGggZD0ibTggMTktMiAzIi8+PHBhdGggZD0ibTE4IDIyLTItMyIvPjxwYXRoIGQ9Ik04IDE1aDAiLz48cGF0aCBkPSJNMTYgMTVoMCIvPjwvc3ZnPg==",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]
