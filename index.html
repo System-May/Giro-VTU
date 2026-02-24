@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle Unitário - Giro Grão VTU</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel Standalone -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- XLSX Library -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+    
+    .toast {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 16px 20px;
+      margin-top: 8px;
+      min-width: 300px;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .toast.success {
+      border-left: 4px solid #10b981;
+    }
+    
+    .toast.error {
+      border-left: 4px solid #ef4444;
+    }
+    
+    .toast-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .toast-description {
+      font-size: 14px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Toast System
+    const showToast = (type, title, description = '') => {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <div class="toast-title">${title}</div>
+        ${description ? `<div class="toast-description">${description}</div>` : ''}
+      `;
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => container.removeChild(toast), 300);
+      }, 3000);
+    };
+
+    // Lucide Icons Components
+    const Train = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect width="16" height="16" x="4" y="3" rx="2"/>
+        <path d="M4 11h16"/>
+        <path d="M12 3v8"/>
+        <path d="m8 19-2 3"/>
+        <path d="m18 22-2-3"/>
+        <path d="M8 15h0"/>
+        <path d="M16 15h0"/>
+      </svg>
+    );
+
+    const CheckCircle = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+    );
+
+    const Download = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" x2="12" y1="15" y2="3"/>
+      </svg>
+    );
+
+    const Trash2 = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 6h18"/>
+        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+        <line x1="10" x2="10" y1="11" y2="17"/>
+        <line x1="14" x2="14" y1="11" y2="17"/>
+      </svg>
+    );
+
+    const FileSpreadsheet = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+        <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+        <path d="M8 13h2"/>
+        <path d="M14 13h2"/>
+        <path d="M8 17h2"/>
+        <path d="M14 17h2"/>
+      </svg>
+    );
+
+    // Logo SYSTEMAY base64
+    const LOGO_SYSTEMAY = "data:image/png;base64,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";
+
+    // Form Component
+    function ControlePainelForm({ onSubmit }) {
+      const motivosLista = [
+        "ALTERAÇÃO PROGRAMAÇÃO PCO",
+        "ATRASO DOCUMENTAÇÃO FERTI",
+        "AVARIA DE LOCOMOTIVA / VAGÃO",
+        "CARREGAMENTO PORTO / FERTI",
+        "CONDIÇÕES CLIMÁTICAS",
+        "DEFEITO SINALIZAÇÃO",
+        "DESCARGA MOEGA / PORTO",
+        "FALTA / ATRASO EQUIPAGEM",
+        "FALTA DE LOCOMOTIVA",
+        "FALTA ENERGIA",
+        "MANOBRA DE PATIO",
+        "PATIO CONGESTIONADO",
+        "PRIORIDADE CIRCULAÇÃO OUTROS FLUXOS",
+        "REFLEXO OUTROS FLUXOS (AMT / CNT)",
+        "VP - MANUTENÇÃO",
+      ];
+
+      const [formData, setFormData] = useState({
+        prefixoChegada: "",
+        qtdVZ: "",
+        produto: "",
+        entradaVTU: "",
+        inicioDescarga: "",
+        terminoDescarga: "",
+        saidaVTU: "",
+        metaAntes: "04:57",
+        realAntes: "",
+        motivoAntes: "",
+        observacaoAntes: "",
+        metaDurante: "05:34",
+        realDurante: "",
+        motivoDurante: "",
+        observacaoDurante: "",
+        metaApos: "15:39",
+        realApos: "",
+        motivoApos: "",
+        observacaoApos: "",
+      });
+
+      const getCorReal = (meta, real) => {
+        if (!meta || !real) return "bg-gray-100";
+        
+        const [metaH, metaM] = meta.split(":").map(Number);
+        const [realH, realM] = real.split(":").map(Number);
+        
+        const metaMinutos = metaH * 60 + metaM;
+        const realMinutos = realH * 60 + realM;
+        
+        return realMinutos <= metaMinutos ? "bg-green-500 text-white" : "bg-red-500 text-white";
+      };
+
+      useEffect(() => {
+        if (formData.entradaVTU && formData.inicioDescarga) {
+          const entrada = new Date(formData.entradaVTU);
+          const inicio = new Date(formData.inicioDescarga);
+          const diffMs = inicio.getTime() - entrada.getTime();
+          const diffMinutos = Math.floor(diffMs / (1000 * 60));
+          
+          const horas = Math.floor(diffMinutos / 60);
+          const minutos = diffMinutos % 60;
+          
+          setFormData(prev => ({
+            ...prev,
+            realAntes: `${String(horas).padStart(2, "0")}:${String(Math.abs(minutos)).padStart(2, "0")}`
+          }));
+        }
+      }, [formData.entradaVTU, formData.inicioDescarga]);
+
+      useEffect(() => {
+        if (formData.inicioDescarga && formData.terminoDescarga) {
+          const inicio = new Date(formData.inicioDescarga);
+          const final = new Date(formData.terminoDescarga);
+          const diffMs = final.getTime() - inicio.getTime();
+          const diffMinutos = Math.floor(diffMs / (1000 * 60));
+          
+          const horas = Math.floor(diffMinutos / 60);
+          const minutos = diffMinutos % 60;
+          
+          setFormData(prev => ({
+            ...prev,
+            realDurante: `${String(horas).padStart(2, "0")}:${String(Math.abs(minutos)).padStart(2, "0")}`
+          }));
+        }
+      }, [formData.inicioDescarga, formData.terminoDescarga]);
+
+      useEffect(() => {
+        if (formData.terminoDescarga && formData.saidaVTU) {
+          const final = new Date(formData.terminoDescarga);
+          const saida = new Date(formData.saidaVTU);
+          const diffMs = saida.getTime() - final.getTime();
+          const diffMinutos = Math.floor(diffMs / (1000 * 60));
+          
+          const horas = Math.floor(diffMinutos / 60);
+          const minutos = diffMinutos % 60;
+          
+          setFormData(prev => ({
+            ...prev,
+            realApos: `${String(horas).padStart(2, "0")}:${String(Math.abs(minutos)).padStart(2, "0")}`
+          }));
+        }
+      }, [formData.terminoDescarga, formData.saidaVTU]);
+
+      const handleChange = (field, value) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const camposObrigatorios = [
+          "prefixoChegada",
+          "produto",
+          "entradaVTU",
+          "inicioDescarga",
+          "terminoDescarga",
+          "saidaVTU",
+        ];
+
+        const camposVazios = camposObrigatorios.filter(
+          campo => !formData[campo].trim()
+        );
+
+        if (camposVazios.length > 0) {
+          showToast("error", "Campos obrigatórios não preenchidos!", "Preencha todos os campos principais antes de confirmar.");
+          return;
+        }
+
+        onSubmit(formData);
+
+        setFormData({
+          prefixoChegada: "",
+          qtdVZ: "",
+          produto: "",
+          entradaVTU: "",
+          inicioDescarga: "",
+          terminoDescarga: "",
+          saidaVTU: "",
+          metaAntes: "04:57",
+          realAntes: "",
+          motivoAntes: "",
+          observacaoAntes: "",
+          metaDurante: "05:34",
+          realDurante: "",
+          motivoDurante: "",
+          observacaoDurante: "",
+          metaApos: "15:39",
+          realApos: "",
+          motivoApos: "",
+          observacaoApos: "",
+        });
+
+        showToast("success", "Registro salvo com sucesso!", `${formData.produto} registrado.`);
+      };
+
+      return (
+        <form onSubmit={handleSubmit}>
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-orange-600 px-6 py-3 flex items-center gap-3 border-b-4 border-orange-700">
+              <div className="bg-white p-2 rounded-md shadow-md">
+                <Train />
+              </div>
+              <div className="flex-1 text-center">
+                <h1 className="text-xl font-bold text-white">Controle Unitário - Antes e Durante Grão</h1>
+                <p className="text-xs text-orange-100">Sistema de controle Unitário – Giro Grão VTU</p>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Campos principais */}
+              <div className="grid grid-cols-7 gap-4">
+                <div>
+                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                    Trem
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.prefixoChegada}
+                    onChange={(e) => handleChange("prefixoChegada", e.target.value)}
+                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                    QTD VZ *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.qtdVZ}
+                    onChange={(e) => handleChange("qtdVZ", e.target.value)}
+                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                    Produto
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.produto}
+                    onChange={(e) => handleChange("produto", e.target.value)}
+                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                    Entrada VTU
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={formData.entradaVTU}
+                    onChange={(e) => handleChange("entradaVTU", e.target.value)}
+                    style={{fontSize: '8px'}}
+                    className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                    Início MG
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={formData.inicioDescarga}
+                    onChange={(e) => handleChange("inicioDescarga", e.target.value)}
+                    style={{fontSize: '8px'}}
+                    className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                    Final MG
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={formData.terminoDescarga}
+                    onChange={(e) => handleChange("terminoDescarga", e.target.value)}
+                    style={{fontSize: '8px'}}
+                    className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                    Saída da VTU
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={formData.saidaVTU}
+                    onChange={(e) => handleChange("saidaVTU", e.target.value)}
+                    style={{fontSize: '8px'}}
+                    className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                  />
+                </div>
+              </div>
+
+              {/* META ANTES */}
+              <div className="bg-orange-700/30 rounded-lg p-4">
+                <h3 className="text-white font-bold text-xs mb-3 bg-red-600 inline-block px-3 py-1 rounded">
+                  ANTES
+                </h3>
+                <div className="grid gap-3" style={{gridTemplateColumns: '120px 120px 200px 1fr'}}>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      META
+                    </label>
+                    <input
+                      type="time"
+                      value={formData.metaAntes}
+                      readOnly
+                      className="w-full px-2 py-2.5 rounded bg-yellow-400 border-2 border-white font-bold text-sm text-center text-black focus:outline-none cursor-not-allowed h-10"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      REAL
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.realAntes}
+                      readOnly
+                      className={`w-full px-2 py-2.5 rounded ${getCorReal(formData.metaAntes, formData.realAntes)} border-2 border-white font-bold text-sm text-center focus:outline-none cursor-not-allowed h-10`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      MOTIVO
+                    </label>
+                    <select
+                      value={formData.motivoAntes}
+                      onChange={(e) => handleChange("motivoAntes", e.target.value)}
+                      style={{fontSize: '10px'}}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    >
+                      <option value="">Selecione...</option>
+                      {motivosLista.map((motivo) => (
+                        <option key={motivo} value={motivo}>
+                          {motivo}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      OBSERVAÇÃO
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.observacaoAntes}
+                      onChange={(e) => handleChange("observacaoAntes", e.target.value)}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* META DURANTE */}
+              <div className="bg-orange-700/30 rounded-lg p-4">
+                <h3 className="text-white font-bold text-xs mb-3 bg-red-600 inline-block px-3 py-1 rounded">
+                  DURANTE
+                </h3>
+                <div className="grid gap-3" style={{gridTemplateColumns: '120px 120px 200px 1fr'}}>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      META
+                    </label>
+                    <input
+                      type="time"
+                      value={formData.metaDurante}
+                      readOnly
+                      className="w-full px-2 py-2.5 rounded bg-yellow-400 border-2 border-white font-bold text-sm text-center text-black focus:outline-none cursor-not-allowed h-10"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      REAL
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.realDurante}
+                      readOnly
+                      className={`w-full px-2 py-2.5 rounded ${getCorReal(formData.metaDurante, formData.realDurante)} border-2 border-white font-bold text-sm text-center focus:outline-none cursor-not-allowed h-10`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      MOTIVO
+                    </label>
+                    <select
+                      value={formData.motivoDurante}
+                      onChange={(e) => handleChange("motivoDurante", e.target.value)}
+                      style={{fontSize: '10px'}}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    >
+                      <option value="">Selecione...</option>
+                      {motivosLista.map((motivo) => (
+                        <option key={motivo} value={motivo}>
+                          {motivo}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      OBSERVAÇÃO
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.observacaoDurante}
+                      onChange={(e) => handleChange("observacaoDurante", e.target.value)}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* META APÓS */}
+              <div className="bg-orange-700/30 rounded-lg p-4">
+                <h3 className="text-white font-bold text-xs mb-3 bg-red-600 inline-block px-3 py-1 rounded">
+                  APÓS
+                </h3>
+                <div className="grid gap-3" style={{gridTemplateColumns: '120px 120px 200px 1fr'}}>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      META
+                    </label>
+                    <input
+                      type="time"
+                      value={formData.metaApos}
+                      readOnly
+                      className="w-full px-2 py-2.5 rounded bg-yellow-400 border-2 border-white font-bold text-sm text-center text-black focus:outline-none cursor-not-allowed h-10"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      REAL
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.realApos}
+                      readOnly
+                      className={`w-full px-2 py-2.5 rounded ${getCorReal(formData.metaApos, formData.realApos)} border-2 border-white font-bold text-sm text-center focus:outline-none cursor-not-allowed h-10`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      MOTIVO
+                    </label>
+                    <select
+                      value={formData.motivoApos}
+                      onChange={(e) => handleChange("motivoApos", e.target.value)}
+                      style={{fontSize: '10px'}}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    >
+                      <option value="">Selecione...</option>
+                      {motivosLista.map((motivo) => (
+                        <option key={motivo} value={motivo}>
+                          {motivo}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      OBSERVAÇÃO
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.observacaoApos}
+                      onChange={(e) => handleChange("observacaoApos", e.target.value)}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Botão Confirmar */}
+              <div className="flex justify-center pt-4">
+                <button
+                  type="submit"
+                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold text-lg flex items-center gap-2 shadow-lg transition-colors"
+                >
+                  <CheckCircle />
+                  CONFIRMAR REGISTRO
+                </button>
+              </div>
+
+              {/* Logo */}
+              <div className="flex justify-end">
+                <div className="bg-white rounded-md px-4 py-2 shadow-md">
+                  <img src={LOGO_SYSTEMAY} alt="SYSTEMAY" className="h-12" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      );
+    }
+
+    // Table Component
+    function RegistrosTable({ registros, onDelete }) {
+      const exportToExcel = () => {
+        if (registros.length === 0) {
+          showToast("error", "Nenhum registro para exportar", "Adicione registros antes de exportar para Excel.");
+          return;
+        }
+
+        const dados = registros.map((registro) => ({
+          "Prefixo Chegada": registro.prefixoChegada,
+          "QTD VZ": registro.qtdVZ,
+          "Produto": registro.produto,
+          "Entrada VTU": registro.entradaVTU,
+          "Início Descarga": registro.inicioDescarga,
+          "Término Descarga": registro.terminoDescarga,
+          "Saída VTU": registro.saidaVTU,
+          "Meta Antes": registro.metaAntes,
+          "Real Antes": registro.realAntes,
+          "Motivo Antes": registro.motivoAntes,
+          "Observação Antes": registro.observacaoAntes,
+          "Meta Durante": registro.metaDurante,
+          "Real Durante": registro.realDurante,
+          "Motivo Durante": registro.motivoDurante,
+          "Observação Durante": registro.observacaoDurante,
+          "Meta Após": registro.metaApos,
+          "Real Após": registro.realApos,
+          "Motivo Após": registro.motivoApos,
+          "Observação Após": registro.observacaoApos,
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(dados);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Controle Unitário");
+
+        const colWidths = Array(19).fill({ wch: 15 });
+        ws["!cols"] = colWidths;
+
+        const fileName = `controle_unitario_${new Date().toISOString().split("T")[0]}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+
+        showToast("success", "Planilha exportada com sucesso!", `Arquivo ${fileName} foi baixado.`);
+      };
+
+      const handleDelete = (id) => {
+        if (confirm("Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.")) {
+          onDelete(id);
+          showToast("success", "Registro excluído com sucesso!");
+        }
+      };
+
+      if (registros.length === 0) {
+        return (
+          <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+            <FileSpreadsheet />
+            <p className="text-gray-500 mb-2 mt-4">Nenhum registro encontrado</p>
+            <p className="text-sm text-gray-400">Use o painel acima para adicionar registros</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold">Histórico de Registros</h3>
+            <button 
+              onClick={exportToExcel} 
+              className="gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-semibold flex items-center"
+            >
+              <Download />
+              Exportar para Excel
+            </button>
+          </div>
+
+          <div className="rounded-md border overflow-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-orange-600">
+                  <th className="text-white p-2 text-sm">Prefixo</th>
+                  <th className="text-white p-2 text-sm">QTD VZ</th>
+                  <th className="text-white p-2 text-sm">Produto</th>
+                  <th className="text-white p-2 text-sm">Entrada VTU</th>
+                  <th className="text-white p-2 text-sm">Início</th>
+                  <th className="text-white p-2 text-sm">Término</th>
+                  <th className="text-white p-2 text-sm">Saída VTU</th>
+                  <th className="text-white p-2 text-sm">Meta Antes</th>
+                  <th className="text-white p-2 text-sm">Real Antes</th>
+                  <th className="text-white p-2 text-sm">Meta Durante</th>
+                  <th className="text-white p-2 text-sm">Real Durante</th>
+                  <th className="text-white p-2 text-sm">Meta Após</th>
+                  <th className="text-white p-2 text-sm">Real Após</th>
+                  <th className="text-white p-2 text-sm">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {registros.map((registro, index) => (
+                  <tr 
+                    key={registro.id} 
+                    className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                  >
+                    <td className="p-2 font-medium text-sm">{registro.prefixoChegada}</td>
+                    <td className="p-2 text-sm">{registro.qtdVZ}</td>
+                    <td className="p-2 text-sm">{registro.produto}</td>
+                    <td className="p-2 font-semibold text-orange-600 text-sm">{registro.entradaVTU}</td>
+                    <td className="p-2 text-sm">{registro.inicioDescarga}</td>
+                    <td className="p-2 text-sm">{registro.terminoDescarga}</td>
+                    <td className="p-2 font-semibold text-orange-600 text-sm">{registro.saidaVTU}</td>
+                    <td className="p-2 bg-yellow-100 text-sm">{registro.metaAntes}</td>
+                    <td className="p-2 text-sm">{registro.realAntes}</td>
+                    <td className="p-2 bg-yellow-100 text-sm">{registro.metaDurante}</td>
+                    <td className="p-2 text-sm">{registro.realDurante}</td>
+                    <td className="p-2 bg-yellow-100 text-sm">{registro.metaApos}</td>
+                    <td className="p-2 text-sm">{registro.realApos}</td>
+                    <td className="p-2">
+                      <button
+                        onClick={() => handleDelete(registro.id)}
+                        className="p-2 hover:bg-gray-200 rounded"
+                      >
+                        <Trash2 />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="text-sm text-gray-500 text-right">
+            Total de registros: {registros.length}
+          </div>
+        </div>
+      );
+    }
+
+    // Main App
+    function App() {
+      const [registros, setRegistros] = useState([]);
+      const [showTable, setShowTable] = useState(false);
+
+      const handleAddRegistro = (registro) => {
+        const novoRegistro = {
+          ...registro,
+          id: Date.now().toString(),
+        };
+        setRegistros([...registros, novoRegistro]);
+      };
+
+      const handleDeleteRegistro = (id) => {
+        setRegistros(registros.filter((r) => r.id !== id));
+      };
+
+      return (
+        <div className="min-h-screen bg-gray-100 p-4">
+          <div className="max-w-[1400px] mx-auto space-y-4">
+            <ControlePainelForm onSubmit={handleAddRegistro} />
+            
+            {registros.length > 0 && (
+              <div className="space-y-2">
+                <button
+                  onClick={() => setShowTable(!showTable)}
+                  className="w-full bg-white px-4 py-2 rounded shadow text-left hover:bg-gray-50 flex items-center justify-between"
+                >
+                  <span className="font-semibold">
+                    Registros Salvos ({registros.length})
+                  </span>
+                  <span className="text-gray-500">
+                    {showTable ? "▲ Ocultar" : "▼ Mostrar"}
+                  </span>
+                </button>
+                
+                {showTable && (
+                  <div className="bg-white rounded shadow p-4">
+                    <RegistrosTable 
+                      registros={registros} 
+                      onDelete={handleDeleteRegistro}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Render
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
