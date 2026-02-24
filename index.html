@@ -200,6 +200,8 @@
         realApos: "",
         motivoApos: "",
         observacaoApos: "",
+        metaGiro: "26:10",
+        realGiro: "",
       });
 
       const getCorReal = (meta, real) => {
@@ -213,6 +215,24 @@
         
         return realMinutos <= metaMinutos ? "bg-green-500 text-white" : "bg-red-500 text-white";
       };
+
+      // Calcular GIRO (soma de Antes + Durante + Depois)
+      useEffect(() => {
+        if (formData.realAntes && formData.realDurante && formData.realApos) {
+          const [antesH, antesM] = formData.realAntes.split(":").map(Number);
+          const [duranteH, duranteM] = formData.realDurante.split(":").map(Number);
+          const [aposH, aposM] = formData.realApos.split(":").map(Number);
+          
+          const totalMinutos = (antesH * 60 + antesM) + (duranteH * 60 + duranteM) + (aposH * 60 + aposM);
+          const horas = Math.floor(totalMinutos / 60);
+          const minutos = totalMinutos % 60;
+          
+          setFormData(prev => ({
+            ...prev,
+            realGiro: `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`
+          }));
+        }
+      }, [formData.realAntes, formData.realDurante, formData.realApos]);
 
       useEffect(() => {
         if (formData.entradaVTU && formData.inicioDescarga) {
@@ -312,6 +332,8 @@
           realApos: "",
           motivoApos: "",
           observacaoApos: "",
+          metaGiro: "26:10",
+          realGiro: "",
         });
 
         showToast("success", "Registro salvo com sucesso!", `${formData.produto} registrado.`);
@@ -612,6 +634,38 @@
                 </div>
               </div>
 
+              {/* META GIRO */}
+              <div className="bg-orange-700/30 rounded-lg p-4">
+                <h3 className="text-white font-bold text-xs mb-3 bg-red-600 inline-block px-3 py-1 rounded">
+                  GIRO
+                </h3>
+                <div className="grid gap-3" style={{gridTemplateColumns: '120px 120px 200px 1fr'}}>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      META
+                    </label>
+                    <input
+                      type="time"
+                      value={formData.metaGiro}
+                      readOnly
+                      className="w-full px-2 py-2.5 rounded bg-yellow-400 border-2 border-white font-bold text-sm text-center text-black focus:outline-none cursor-not-allowed h-10"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      REAL
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.realGiro}
+                      readOnly
+                      className={`w-full px-2 py-2.5 rounded ${getCorReal(formData.metaGiro, formData.realGiro)} border-2 border-white font-bold text-sm text-center focus:outline-none cursor-not-allowed h-10`}
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Botão Confirmar */}
               <div className="flex justify-center pt-4">
                 <button
@@ -625,9 +679,9 @@
 
               {/* Logo SYSTEMAY */}
               <div className="flex justify-end">
-                <div className="bg-white rounded-lg px-8 py-4 shadow-lg border-2 border-orange-200">
-                  <div className="flex items-center gap-3">
-                    <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <div className="bg-white rounded px-3 py-1.5 shadow border border-orange-200">
+                  <div className="flex items-center gap-2">
+                    <svg width="20" height="20" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                       <defs>
                         <linearGradient id="rocketGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                           <stop offset="0%" style={{stopColor:"#ea580c", stopOpacity:1}} />
@@ -639,10 +693,10 @@
                       <ellipse cx="50" cy="75" rx="20" ry="8" fill="#ea580c" opacity="0.3"/>
                     </svg>
                     <div>
-                      <div className="text-2xl font-bold" style={{color:"#ea580c", letterSpacing:"1px"}}>
+                      <div className="text-sm font-bold" style={{color:"#ea580c", letterSpacing:"0.5px"}}>
                         SYSTEMAY
                       </div>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-xs text-gray-600" style={{fontSize:"9px"}}>
                         Sistemas inteligentes para gestão
                       </div>
                     </div>
@@ -657,6 +711,18 @@
 
     // Table Component
     function RegistrosTable({ registros, onDelete }) {
+      // Função para converter datetime-local para formato brasileiro
+      const formatarDataBrasil = (datetimeLocal) => {
+        if (!datetimeLocal) return "";
+        const date = new Date(datetimeLocal);
+        const dia = String(date.getDate()).padStart(2, "0");
+        const mes = String(date.getMonth() + 1).padStart(2, "0");
+        const ano = date.getFullYear();
+        const hora = String(date.getHours()).padStart(2, "0");
+        const minuto = String(date.getMinutes()).padStart(2, "0");
+        return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
+      };
+
       const exportToExcel = () => {
         if (registros.length === 0) {
           showToast("error", "Nenhum registro para exportar", "Adicione registros antes de exportar para Excel.");
@@ -667,10 +733,10 @@
           "Prefixo Chegada": registro.prefixoChegada,
           "QTD VZ": registro.qtdVZ,
           "Produto": registro.produto,
-          "Entrada VTU": registro.entradaVTU,
-          "Início Descarga": registro.inicioDescarga,
-          "Término Descarga": registro.terminoDescarga,
-          "Saída VTU": registro.saidaVTU,
+          "Entrada VTU": formatarDataBrasil(registro.entradaVTU),
+          "Início Descarga": formatarDataBrasil(registro.inicioDescarga),
+          "Término Descarga": formatarDataBrasil(registro.terminoDescarga),
+          "Saída VTU": formatarDataBrasil(registro.saidaVTU),
           "Meta Antes": registro.metaAntes,
           "Real Antes": registro.realAntes,
           "Motivo Antes": registro.motivoAntes,
@@ -683,6 +749,8 @@
           "Real Após": registro.realApos,
           "Motivo Após": registro.motivoApos,
           "Observação Após": registro.observacaoApos,
+          "Meta Giro": registro.metaGiro,
+          "Real Giro": registro.realGiro,
         }));
 
         const ws = XLSX.utils.json_to_sheet(dados);
