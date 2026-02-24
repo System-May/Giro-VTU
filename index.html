@@ -181,6 +181,7 @@
       ];
 
       const [formData, setFormData] = useState({
+        programador: "",
         prefixoChegada: "",
         vgCA: "",
         vgVZ: "",
@@ -294,6 +295,7 @@
         e.preventDefault();
 
         const camposObrigatorios = [
+          "programador",
           "prefixoChegada",
           "produto",
           "entradaVTU",
@@ -314,6 +316,7 @@
         onSubmit(formData);
 
         setFormData({
+          programador: "",
           prefixoChegada: "",
           vgCA: "",
           vgVZ: "",
@@ -688,6 +691,26 @@
                 </div>
               </div>
 
+              {/* PROGRAMADOR */}
+              <div className="flex justify-center">
+                <div className="w-80">
+                  <label className="text-white text-sm font-bold block mb-2 text-center">
+                    Selecione o Programador
+                  </label>
+                  <select
+                    value={formData.programador}
+                    onChange={(e) => handleChange("programador", e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg bg-white border-2 border-white font-bold text-base text-center focus:outline-none focus:ring-2 focus:ring-orange-300"
+                  >
+                    <option value="">Selecione...</option>
+                    <option value="Tais">Tais</option>
+                    <option value="Luis">Luis</option>
+                    <option value="Flávio">Flávio</option>
+                    <option value="Wydson">Wydson</option>
+                  </select>
+                </div>
+              </div>
+
               {/* Botão Confirmar */}
               <div className="flex justify-center pt-4">
                 <button
@@ -725,6 +748,7 @@
         }
 
         const dados = registros.map((registro) => ({
+          "Programador": registro.programador,
           "Trem": registro.prefixoChegada,
           "VG-CA": registro.vgCA,
           "VG-VZ": registro.vgVZ,
