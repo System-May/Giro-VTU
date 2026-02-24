@@ -182,7 +182,8 @@
 
       const [formData, setFormData] = useState({
         prefixoChegada: "",
-        qtdVZ: "",
+        vgCA: "",
+        vgVZ: "",
         produto: "",
         entradaVTU: "",
         inicioDescarga: "",
@@ -314,7 +315,8 @@
 
         setFormData({
           prefixoChegada: "",
-          qtdVZ: "",
+          vgCA: "",
+          vgVZ: "",
           produto: "",
           entradaVTU: "",
           inicioDescarga: "",
@@ -355,28 +357,46 @@
 
             <div className="p-6 space-y-6">
               {/* Campos principais */}
-              <div className="grid grid-cols-7 gap-4">
+              <div className="grid gap-3" style={{gridTemplateColumns: '80px 70px 70px 1fr 1fr 1fr 1fr 1fr'}}>
                 <div>
-                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
                     Trem
                   </label>
                   <input
                     type="text"
+                    maxLength="4"
                     value={formData.prefixoChegada}
-                    onChange={(e) => handleChange("prefixoChegada", e.target.value)}
-                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    onChange={(e) => handleChange("prefixoChegada", e.target.value.toUpperCase())}
+                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    placeholder="J210"
                   />
                 </div>
 
                 <div>
-                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
-                    QTD VZ *
+                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
+                    VG-CA
                   </label>
                   <input
                     type="text"
-                    value={formData.qtdVZ}
-                    onChange={(e) => handleChange("qtdVZ", e.target.value)}
-                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    maxLength="2"
+                    value={formData.vgCA}
+                    onChange={(e) => handleChange("vgCA", e.target.value.toUpperCase())}
+                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    placeholder="20"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
+                    VG-VZ
+                  </label>
+                  <input
+                    type="text"
+                    maxLength="2"
+                    value={formData.vgVZ}
+                    onChange={(e) => handleChange("vgVZ", e.target.value.toUpperCase())}
+                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    placeholder="15"
                   />
                 </div>
 
@@ -730,8 +750,9 @@
         }
 
         const dados = registros.map((registro) => ({
-          "Prefixo Chegada": registro.prefixoChegada,
-          "QTD VZ": registro.qtdVZ,
+          "Trem": registro.prefixoChegada,
+          "VG-CA": registro.vgCA,
+          "VG-VZ": registro.vgVZ,
           "Produto": registro.produto,
           "Entrada VTU": formatarDataBrasil(registro.entradaVTU),
           "Início Descarga": formatarDataBrasil(registro.inicioDescarga),
