@@ -628,8 +628,19 @@
 
               {/* Logo */}
               <div className="flex justify-end">
-                <div className="bg-white rounded-md px-4 py-2 shadow-md">
-                  <img src={LOGO_SYSTEMAY} alt="SYSTEMAY" className="h-12" />
+                <div className="bg-white rounded-lg px-6 py-3 shadow-lg border-2 border-orange-200">
+                  <svg width="200" height="48" viewBox="0 0 200 48" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style={{stopColor:"#ea580c", stopOpacity:1}} />
+                        <stop offset="100%" style={{stopColor:"#fb923c", stopOpacity:1}} />
+                      </linearGradient>
+                    </defs>
+                    <text x="10" y="32" fontFamily="Arial, sans-serif" fontSize="28" fontWeight="bold" fill="url(#logoGradient)" letterSpacing="1">
+                      SYSTEMAY
+                    </text>
+                    <path d="M 180 12 L 195 24 L 180 36" stroke="#ea580c" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
                 </div>
               </div>
             </div>
