@@ -247,56 +247,110 @@
         }
       }, [formData.realAntes, formData.realDurante, formData.realApos]);
 
+      // Calcular ANTES (média dos dois trens)
       useEffect(() => {
+        const tempos = [];
+        
+        // Trem 1
         if (formData.entradaVTU1 && formData.inicioDescarga1) {
           const entrada = new Date(formData.entradaVTU1);
           const inicio = new Date(formData.inicioDescarga1);
           const diffMs = inicio.getTime() - entrada.getTime();
           const diffMinutos = Math.floor(diffMs / (1000 * 60));
-          
-          const horas = Math.floor(diffMinutos / 60);
-          const minutos = diffMinutos % 60;
+          tempos.push(diffMinutos);
+        }
+        
+        // Trem 2
+        if (formData.entradaVTU2 && formData.inicioDescarga2) {
+          const entrada = new Date(formData.entradaVTU2);
+          const inicio = new Date(formData.inicioDescarga2);
+          const diffMs = inicio.getTime() - entrada.getTime();
+          const diffMinutos = Math.floor(diffMs / (1000 * 60));
+          tempos.push(diffMinutos);
+        }
+        
+        // Calcular média
+        if (tempos.length > 0) {
+          const mediaMinutos = Math.floor(tempos.reduce((a, b) => a + b, 0) / tempos.length);
+          const horas = Math.floor(mediaMinutos / 60);
+          const minutos = mediaMinutos % 60;
           
           setFormData(prev => ({
             ...prev,
             realAntes: `${String(horas).padStart(2, "0")}:${String(Math.abs(minutos)).padStart(2, "0")}`
           }));
         }
-      }, [formData.entradaVTU1, formData.inicioDescarga1]);
+      }, [formData.entradaVTU1, formData.inicioDescarga1, formData.entradaVTU2, formData.inicioDescarga2]);
 
+      // Calcular DURANTE (média dos dois trens)
       useEffect(() => {
+        const tempos = [];
+        
+        // Trem 1
         if (formData.inicioDescarga1 && formData.terminoDescarga1) {
           const inicio = new Date(formData.inicioDescarga1);
           const final = new Date(formData.terminoDescarga1);
           const diffMs = final.getTime() - inicio.getTime();
           const diffMinutos = Math.floor(diffMs / (1000 * 60));
-          
-          const horas = Math.floor(diffMinutos / 60);
-          const minutos = diffMinutos % 60;
+          tempos.push(diffMinutos);
+        }
+        
+        // Trem 2
+        if (formData.inicioDescarga2 && formData.terminoDescarga2) {
+          const inicio = new Date(formData.inicioDescarga2);
+          const final = new Date(formData.terminoDescarga2);
+          const diffMs = final.getTime() - inicio.getTime();
+          const diffMinutos = Math.floor(diffMs / (1000 * 60));
+          tempos.push(diffMinutos);
+        }
+        
+        // Calcular média
+        if (tempos.length > 0) {
+          const mediaMinutos = Math.floor(tempos.reduce((a, b) => a + b, 0) / tempos.length);
+          const horas = Math.floor(mediaMinutos / 60);
+          const minutos = mediaMinutos % 60;
           
           setFormData(prev => ({
             ...prev,
             realDurante: `${String(horas).padStart(2, "0")}:${String(Math.abs(minutos)).padStart(2, "0")}`
           }));
         }
-      }, [formData.inicioDescarga1, formData.terminoDescarga1]);
+      }, [formData.inicioDescarga1, formData.terminoDescarga1, formData.inicioDescarga2, formData.terminoDescarga2]);
 
+      // Calcular DEPOIS (média dos dois trens)
       useEffect(() => {
+        const tempos = [];
+        
+        // Trem 1
         if (formData.terminoDescarga1 && formData.saidaVTU1) {
           const final = new Date(formData.terminoDescarga1);
           const saida = new Date(formData.saidaVTU1);
           const diffMs = saida.getTime() - final.getTime();
           const diffMinutos = Math.floor(diffMs / (1000 * 60));
-          
-          const horas = Math.floor(diffMinutos / 60);
-          const minutos = diffMinutos % 60;
+          tempos.push(diffMinutos);
+        }
+        
+        // Trem 2
+        if (formData.terminoDescarga2 && formData.saidaVTU2) {
+          const final = new Date(formData.terminoDescarga2);
+          const saida = new Date(formData.saidaVTU2);
+          const diffMs = saida.getTime() - final.getTime();
+          const diffMinutos = Math.floor(diffMs / (1000 * 60));
+          tempos.push(diffMinutos);
+        }
+        
+        // Calcular média
+        if (tempos.length > 0) {
+          const mediaMinutos = Math.floor(tempos.reduce((a, b) => a + b, 0) / tempos.length);
+          const horas = Math.floor(mediaMinutos / 60);
+          const minutos = mediaMinutos % 60;
           
           setFormData(prev => ({
             ...prev,
             realApos: `${String(horas).padStart(2, "0")}:${String(Math.abs(minutos)).padStart(2, "0")}`
           }));
         }
-      }, [formData.terminoDescarga1, formData.saidaVTU1]);
+      }, [formData.terminoDescarga1, formData.saidaVTU1, formData.terminoDescarga2, formData.saidaVTU2]);
 
       const handleChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
