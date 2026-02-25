@@ -182,14 +182,25 @@
 
       const [formData, setFormData] = useState({
         programador: "",
-        prefixoChegada: "",
-        vgCA: "",
-        vgVZ: "",
-        produto: "",
-        entradaVTU: "",
-        inicioDescarga: "",
-        terminoDescarga: "",
-        saidaVTU: "",
+        // Trem 1/1
+        prefixoChegada1: "",
+        vgCA1: "",
+        vgVZ1: "",
+        produto1: "",
+        entradaVTU1: "",
+        inicioDescarga1: "",
+        terminoDescarga1: "",
+        saidaVTU1: "",
+        // Trem 2/1
+        prefixoChegada2: "",
+        vgCA2: "",
+        vgVZ2: "",
+        produto2: "",
+        entradaVTU2: "",
+        inicioDescarga2: "",
+        terminoDescarga2: "",
+        saidaVTU2: "",
+        // Metas e cálculos
         metaAntes: "04:57",
         realAntes: "",
         motivoAntes: "",
@@ -237,9 +248,9 @@
       }, [formData.realAntes, formData.realDurante, formData.realApos]);
 
       useEffect(() => {
-        if (formData.entradaVTU && formData.inicioDescarga) {
-          const entrada = new Date(formData.entradaVTU);
-          const inicio = new Date(formData.inicioDescarga);
+        if (formData.entradaVTU1 && formData.inicioDescarga1) {
+          const entrada = new Date(formData.entradaVTU1);
+          const inicio = new Date(formData.inicioDescarga1);
           const diffMs = inicio.getTime() - entrada.getTime();
           const diffMinutos = Math.floor(diffMs / (1000 * 60));
           
@@ -251,12 +262,12 @@
             realAntes: `${String(horas).padStart(2, "0")}:${String(Math.abs(minutos)).padStart(2, "0")}`
           }));
         }
-      }, [formData.entradaVTU, formData.inicioDescarga]);
+      }, [formData.entradaVTU1, formData.inicioDescarga1]);
 
       useEffect(() => {
-        if (formData.inicioDescarga && formData.terminoDescarga) {
-          const inicio = new Date(formData.inicioDescarga);
-          const final = new Date(formData.terminoDescarga);
+        if (formData.inicioDescarga1 && formData.terminoDescarga1) {
+          const inicio = new Date(formData.inicioDescarga1);
+          const final = new Date(formData.terminoDescarga1);
           const diffMs = final.getTime() - inicio.getTime();
           const diffMinutos = Math.floor(diffMs / (1000 * 60));
           
@@ -268,12 +279,12 @@
             realDurante: `${String(horas).padStart(2, "0")}:${String(Math.abs(minutos)).padStart(2, "0")}`
           }));
         }
-      }, [formData.inicioDescarga, formData.terminoDescarga]);
+      }, [formData.inicioDescarga1, formData.terminoDescarga1]);
 
       useEffect(() => {
-        if (formData.terminoDescarga && formData.saidaVTU) {
-          const final = new Date(formData.terminoDescarga);
-          const saida = new Date(formData.saidaVTU);
+        if (formData.terminoDescarga1 && formData.saidaVTU1) {
+          const final = new Date(formData.terminoDescarga1);
+          const saida = new Date(formData.saidaVTU1);
           const diffMs = saida.getTime() - final.getTime();
           const diffMinutos = Math.floor(diffMs / (1000 * 60));
           
@@ -285,7 +296,7 @@
             realApos: `${String(horas).padStart(2, "0")}:${String(Math.abs(minutos)).padStart(2, "0")}`
           }));
         }
-      }, [formData.terminoDescarga, formData.saidaVTU]);
+      }, [formData.terminoDescarga1, formData.saidaVTU1]);
 
       const handleChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -296,12 +307,12 @@
 
         const camposObrigatorios = [
           "programador",
-          "prefixoChegada",
-          "produto",
-          "entradaVTU",
-          "inicioDescarga",
-          "terminoDescarga",
-          "saidaVTU",
+          "prefixoChegada1",
+          "produto1",
+          "entradaVTU1",
+          "inicioDescarga1",
+          "terminoDescarga1",
+          "saidaVTU1",
         ];
 
         const camposVazios = camposObrigatorios.filter(
@@ -317,14 +328,22 @@
 
         setFormData({
           programador: "",
-          prefixoChegada: "",
-          vgCA: "",
-          vgVZ: "",
-          produto: "",
-          entradaVTU: "",
-          inicioDescarga: "",
-          terminoDescarga: "",
-          saidaVTU: "",
+          prefixoChegada1: "",
+          vgCA1: "",
+          vgVZ1: "",
+          produto1: "",
+          entradaVTU1: "",
+          inicioDescarga1: "",
+          terminoDescarga1: "",
+          saidaVTU1: "",
+          prefixoChegada2: "",
+          vgCA2: "",
+          vgVZ2: "",
+          produto2: "",
+          entradaVTU2: "",
+          inicioDescarga2: "",
+          terminoDescarga2: "",
+          saidaVTU2: "",
           metaAntes: "04:57",
           realAntes: "",
           motivoAntes: "",
@@ -341,7 +360,7 @@
           realGiro: "",
         });
 
-        showToast("success", "Registro salvo com sucesso!", `${formData.produto} registrado.`);
+        showToast("success", "Registro salvo com sucesso!", `${formData.produto1} registrado.`);
       };
 
       return (
@@ -359,114 +378,235 @@
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Campos principais */}
-              <div className="grid gap-3" style={{gridTemplateColumns: '80px 70px 1fr 1fr 1fr 1fr 70px 1fr'}}>
-                <div>
-                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
-                    Trem
-                  </label>
-                  <input
-                    type="text"
-                    maxLength="4"
-                    value={formData.prefixoChegada}
-                    onChange={(e) => handleChange("prefixoChegada", e.target.value.toUpperCase())}
-                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
-                  />
-                </div>
+              {/* TREM 1/1 */}
+              <div className="bg-orange-700/20 rounded-lg p-3">
+                <h3 className="text-white font-bold text-xs mb-2 bg-blue-600 inline-block px-3 py-1 rounded">
+                  TREM 1/1
+                </h3>
+                <div className="grid gap-3" style={{gridTemplateColumns: '80px 70px 1fr 1fr 1fr 1fr 70px 1fr'}}>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
+                      Trem
+                    </label>
+                    <input
+                      type="text"
+                      maxLength="4"
+                      value={formData.prefixoChegada1}
+                      onChange={(e) => handleChange("prefixoChegada1", e.target.value.toUpperCase())}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
 
-                <div>
-                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
-                    VG-CA
-                  </label>
-                  <input
-                    type="text"
-                    maxLength="2"
-                    value={formData.vgCA}
-                    onChange={(e) => handleChange("vgCA", e.target.value.toUpperCase())}
-                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
-                  />
-                </div>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
+                      VG-CA
+                    </label>
+                    <input
+                      type="text"
+                      maxLength="2"
+                      value={formData.vgCA1}
+                      onChange={(e) => handleChange("vgCA1", e.target.value.toUpperCase())}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
 
-                <div>
-                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
-                    Produto
-                  </label>
-                  <select
-                    value={formData.produto}
-                    onChange={(e) => handleChange("produto", e.target.value)}
-                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
-                  >
-                    <option value=""></option>
-                    <option value="Soja">Soja</option>
-                    <option value="Milho">Milho</option>
-                    <option value="Farelo Soja">Farelo Soja</option>
-                    <option value="Farelo Milho">Farelo Milho</option>
-                  </select>
-                </div>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      Produto
+                    </label>
+                    <select
+                      value={formData.produto1}
+                      onChange={(e) => handleChange("produto1", e.target.value)}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    >
+                      <option value=""></option>
+                      <option value="Soja">Soja</option>
+                      <option value="Milho">Milho</option>
+                      <option value="Farelo Soja">Farelo Soja</option>
+                      <option value="Farelo Milho">Farelo Milho</option>
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
-                    Entrada VTU
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.entradaVTU}
-                    onChange={(e) => handleChange("entradaVTU", e.target.value)}
-                    style={{fontSize: '12px'}}
-                    className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
-                  />
-                </div>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      Entrada VTU
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={formData.entradaVTU1}
+                      onChange={(e) => handleChange("entradaVTU1", e.target.value)}
+                      style={{fontSize: '12px'}}
+                      className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
 
-                <div>
-                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
-                    Início Moega
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.inicioDescarga}
-                    onChange={(e) => handleChange("inicioDescarga", e.target.value)}
-                    style={{fontSize: '12px'}}
-                    className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
-                  />
-                </div>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      Início Moega
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={formData.inicioDescarga1}
+                      onChange={(e) => handleChange("inicioDescarga1", e.target.value)}
+                      style={{fontSize: '12px'}}
+                      className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
 
-                <div>
-                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
-                    Fim Moega
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.terminoDescarga}
-                    onChange={(e) => handleChange("terminoDescarga", e.target.value)}
-                    style={{fontSize: '12px'}}
-                    className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
-                  />
-                </div>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      Fim Moega
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={formData.terminoDescarga1}
+                      onChange={(e) => handleChange("terminoDescarga1", e.target.value)}
+                      style={{fontSize: '12px'}}
+                      className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
 
-                <div>
-                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
-                    VG-VZ
-                  </label>
-                  <input
-                    type="text"
-                    maxLength="2"
-                    value={formData.vgVZ}
-                    onChange={(e) => handleChange("vgVZ", e.target.value.toUpperCase())}
-                    className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
-                  />
-                </div>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
+                      VG-VZ
+                    </label>
+                    <input
+                      type="text"
+                      maxLength="2"
+                      value={formData.vgVZ1}
+                      onChange={(e) => handleChange("vgVZ1", e.target.value.toUpperCase())}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
 
-                <div>
-                  <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
-                    Saída da VTU
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.saidaVTU}
-                    onChange={(e) => handleChange("saidaVTU", e.target.value)}
-                    style={{fontSize: '12px'}}
-                    className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
-                  />
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      Saída da VTU
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={formData.saidaVTU1}
+                      onChange={(e) => handleChange("saidaVTU1", e.target.value)}
+                      style={{fontSize: '12px'}}
+                      className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* TREM 2/1 */}
+              <div className="bg-orange-700/20 rounded-lg p-3">
+                <h3 className="text-white font-bold text-xs mb-2 bg-purple-600 inline-block px-3 py-1 rounded">
+                  TREM 2/1
+                </h3>
+                <div className="grid gap-3" style={{gridTemplateColumns: '80px 70px 1fr 1fr 1fr 1fr 70px 1fr'}}>
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
+                      Trem
+                    </label>
+                    <input
+                      type="text"
+                      maxLength="4"
+                      value={formData.prefixoChegada2}
+                      onChange={(e) => handleChange("prefixoChegada2", e.target.value.toUpperCase())}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
+                      VG-CA
+                    </label>
+                    <input
+                      type="text"
+                      maxLength="2"
+                      value={formData.vgCA2}
+                      onChange={(e) => handleChange("vgCA2", e.target.value.toUpperCase())}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      Produto
+                    </label>
+                    <select
+                      value={formData.produto2}
+                      onChange={(e) => handleChange("produto2", e.target.value)}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    >
+                      <option value=""></option>
+                      <option value="Soja">Soja</option>
+                      <option value="Milho">Milho</option>
+                      <option value="Farelo Soja">Farelo Soja</option>
+                      <option value="Farelo Milho">Farelo Milho</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      Entrada VTU
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={formData.entradaVTU2}
+                      onChange={(e) => handleChange("entradaVTU2", e.target.value)}
+                      style={{fontSize: '12px'}}
+                      className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      Início Moega
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={formData.inicioDescarga2}
+                      onChange={(e) => handleChange("inicioDescarga2", e.target.value)}
+                      style={{fontSize: '12px'}}
+                      className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      Fim Moega
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={formData.terminoDescarga2}
+                      onChange={(e) => handleChange("terminoDescarga2", e.target.value)}
+                      style={{fontSize: '12px'}}
+                      className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded text-center">
+                      VG-VZ
+                    </label>
+                    <input
+                      type="text"
+                      maxLength="2"
+                      value={formData.vgVZ2}
+                      onChange={(e) => handleChange("vgVZ2", e.target.value.toUpperCase())}
+                      className="w-full px-2 py-2.5 rounded bg-white border-2 border-white font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-white text-xs font-bold block mb-1 bg-orange-700 px-2 py-1 rounded">
+                      Saída da VTU
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={formData.saidaVTU2}
+                      onChange={(e) => handleChange("saidaVTU2", e.target.value)}
+                      style={{fontSize: '12px'}}
+                      className="w-full px-1 py-2.5 rounded bg-white border-2 border-white font-bold focus:outline-none focus:ring-2 focus:ring-orange-300 h-10"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -749,14 +889,14 @@
 
         const dados = registros.map((registro) => ({
           "Programador": registro.programador,
-          "Trem": registro.prefixoChegada,
-          "VG-CA": registro.vgCA,
-          "VG-VZ": registro.vgVZ,
-          "Produto": registro.produto,
-          "Entrada VTU": formatarDataBrasil(registro.entradaVTU),
-          "Início Descarga": formatarDataBrasil(registro.inicioDescarga),
-          "Término Descarga": formatarDataBrasil(registro.terminoDescarga),
-          "Saída VTU": formatarDataBrasil(registro.saidaVTU),
+          "Trem": registro.prefixoChegada1,
+          "VG-CA": registro.vgCA1,
+          "VG-VZ": registro.vgVZ1,
+          "Produto": registro.produto1,
+          "Entrada VTU": formatarDataBrasil(registro.entradaVTU1),
+          "Início Descarga": formatarDataBrasil(registro.inicioDescarga1),
+          "Término Descarga": formatarDataBrasil(registro.terminoDescarga1),
+          "Saída VTU": formatarDataBrasil(registro.saidaVTU1),
           "Meta Antes": registro.metaAntes,
           "Real Antes": registro.realAntes,
           "Motivo Antes": registro.motivoAntes,
@@ -842,13 +982,13 @@
                     key={registro.id} 
                     className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
                   >
-                    <td className="p-2 font-medium text-sm">{registro.prefixoChegada}</td>
+                    <td className="p-2 font-medium text-sm">{registro.prefixoChegada1}</td>
                     <td className="p-2 text-sm">{registro.qtdVZ}</td>
-                    <td className="p-2 text-sm">{registro.produto}</td>
-                    <td className="p-2 font-semibold text-orange-600 text-sm">{registro.entradaVTU}</td>
-                    <td className="p-2 text-sm">{registro.inicioDescarga}</td>
-                    <td className="p-2 text-sm">{registro.terminoDescarga}</td>
-                    <td className="p-2 font-semibold text-orange-600 text-sm">{registro.saidaVTU}</td>
+                    <td className="p-2 text-sm">{registro.produto1}</td>
+                    <td className="p-2 font-semibold text-orange-600 text-sm">{registro.entradaVTU1}</td>
+                    <td className="p-2 text-sm">{registro.inicioDescarga1}</td>
+                    <td className="p-2 text-sm">{registro.terminoDescarga1}</td>
+                    <td className="p-2 font-semibold text-orange-600 text-sm">{registro.saidaVTU1}</td>
                     <td className="p-2 bg-yellow-100 text-sm">{registro.metaAntes}</td>
                     <td className="p-2 text-sm">{registro.realAntes}</td>
                     <td className="p-2 bg-yellow-100 text-sm">{registro.metaDurante}</td>
